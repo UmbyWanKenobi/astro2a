@@ -22,6 +22,7 @@
   1 MPU6050 accellerometro-giroscopio 6 gradi di libertà
   1 MPL3115A2 barometro - altimetro - termometro
   1 HMC5983 bussola eletttronica
+  1 DS3234 orologio elettronico con quarzo stabilizzato in termperatura
   1 Controller RepRap con monitor 12864 (seriale), buzzer, encoder, letttore SD e pulsante integrati
 */
 
@@ -35,12 +36,21 @@
 #include "DMS.h"
 #include "AccelStepper.h"
 #include "SPI.h"
-
-
-
+#include "math.h"       
 #include "Kalman.h"
+#include "RTClib.h"
 
+// Create an RTC instance, using the chip select pin it's connected to
+RTC_DS3234 RTC(53);
 
+byte a_day;
+byte a_Hour;
+byte a_Minute;
+byte a_Second;
+byte a_bits;
+bool a_Dy;
+bool a_h12;
+bool a_PM;
 Kalman KalmanValue;
 
 RotaryEncoder encoder(30, 28);
@@ -81,7 +91,7 @@ Button ESCAPE( 27,  BUTTON_PULLUP_INTERNAL);
 // Vin +5 SCUDO LCD     // EXP1 10
 //  GND   SCUDO LCD     // EXP1 9
 
-const int  cs=53;
+//const int  cs=53;
 #define MPU 0x68  // I2C address of the MPU-6050
 U8GLIB_ST7920_128X64_1X u8g( E_SCLK, RW_SID, CS_RS );
 MPL3115A2 sensor;
@@ -245,8 +255,8 @@ void loop()
   u8g.firstPage();
   do {
    //
-     UpdateMenu ();
-
+   UpdateMenu ();
+//ReadTimeDate();
   } while ( u8g.nextPage() );
 
 } // loop ()

@@ -1,9 +1,9 @@
 void printFix()
 {
-  byte* data_ora; // Seleziona il dato richiesto 0 per la data, 1 per l'ora
+  byte data_ora; // Seleziona il dato richiesto 0 per la data, 1 per l'ora
   waitForFix();
   u8g.setPrintPos(1, 0);
-  data_ora = 0;
+  data_ora = 1;
   u8g.print(ReadTimeDate(data_ora));
 
   u8g.drawStr(1, 8, "Lat:");
