@@ -32,6 +32,7 @@ void Init_Splash_Draw () {
     u8g.drawStr( 16, 63, "ilpoliedrico.com");
   } while ( u8g.nextPage() );
   Musichina ();
+    Serial.println (JulianDay());  
   delay(3000);
 }
 void Musichina () {

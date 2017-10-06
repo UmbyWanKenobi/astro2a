@@ -27,6 +27,7 @@
 */
 #define build 2
 #define revision 1
+#define DEBUG   // Non commentare per test
 
 #include "U8glib.h"
 #include "Button.h"
@@ -93,13 +94,13 @@ Button ESCAPE( 27,  BUTTON_PULLUP_INTERNAL);
 #define SD_SCK     33   // EXP2 2
 
 
-//const int  cs=53;
 #define MPU 0x68  // I2C address of the MPU-6050
 U8GLIB_ST7920_128X64_1X u8g( E_SCLK, RW_SID, CS_RS );
 MPL3115A2 sensor;
 NMEAGPS  GPS;
 gps_fix  fix;
-
+int yr, mo, dd, hh, mn, ss;
+ 
 
 const int melody[] = {
   NOTE_D7, NOTE_E7, NOTE_C7, NOTE_C6, NOTE_G6 //Musichina
@@ -134,9 +135,10 @@ float quota = 0.0;
 
 void setup()
 {
+#ifdef DEBUG                    // Per Uso  
+  Serial.begin(115200);         //   di
+#endif                          //  debug
 
-  Serial.begin(115200);
-  
   pinMode (SINISTRA, OUTPUT);
   pinMode (BOLLA, OUTPUT);
   pinMode (DESTRA, OUTPUT);
@@ -195,7 +197,7 @@ void UpdateMenu () {
         break;
       case 3:
         while (ESCAPE.isPressed () == false) {
-          printFix();
+          PRINT_INFO();
         }
         break;
       default:

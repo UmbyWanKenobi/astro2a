@@ -5,27 +5,34 @@ void init_GPS() {
   waitForFix();
 }
 
-void printFix()
+void PRINT_INFO()
 {
-  byte data_ora; // Seleziona il dato richiesto 0 per la data, 1 per l'ora
-  waitForFix();
+  byte data_ora, // Seleziona il dato richiesto 0 per la data, 1 per l'ora
+       lat_long; // Seleziona il dato richiesto 0 per la latitudine, 1 per la longitudine
+ 
   u8g.setPrintPos(1, 0);
   data_ora = 1;
   u8g.print(ReadTimeDate(data_ora));
-
-  u8g.drawStr(1, 8, "Lat:");
-  u8g.setPrintPos(20, 8);
-  printDD_MMmmmm( fix.latitudeDMS, fix.latitudeDMS.NS() );
-  u8g.print(_buffer);
-  u8g.drawStr(67, 8, "Lon:");
-  u8g.setPrintPos(87, 8);
-  printDD_MMmmmm( fix.longitudeDMS, fix.longitudeDMS.EW() );
-  u8g.print(_buffer);
-  //  _buffer = "Premi ESC per uscire";
-  // MESSAGGIO_MENU (_buffer);
-  //  }
-  // while (u8g.nextPage());
-
+  
+  u8g.setPrintPos(1, 8);
+  lat_long = 0;
+  u8g.print(ReadLatLong(lat_long));
+  u8g.setPrintPos(67, 8);
+  lat_long = 1;
+  u8g.print(ReadLatLong(lat_long));
+ 
+}
+String ReadLatLong (byte lat_long){
+  String INFO;
+   waitForFix();
+  if (lat_long == 0) {
+    INFO.concat("Lat:");
+  } else {
+    INFO.concat("Lon:");
+  }
+ printDD_MMmmmm( fix.latitudeDMS, fix.latitudeDMS.NS() );
+ INFO.concat(_buffer); 
+ return (INFO);
 
 
 }

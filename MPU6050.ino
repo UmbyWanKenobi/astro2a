@@ -42,7 +42,7 @@ void LIVELLA()
       u8g.setFontRefHeightExtendedText();
       u8g.setDefaultForegroundColor();
       u8g.setFontPosTop();
-      printFix();
+      PRINT_INFO();
       u8g.drawStr(75, 15, "Inclinazione");
       u8g.setPrintPos(90, 55);
       u8g.print(Inclinazione);

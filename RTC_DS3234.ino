@@ -90,13 +90,7 @@ String ReadTimeDate(byte data_ora) {
     const int len = 32;
     static char buf[len];
     /*
-    char Y = now.year();
-    char M = now.month();
-    char D = now.day();
-    char H = now.hour();
-    char Mn= now.minute();
-    char S = now.second();
-
+   
     DateTime now = RTC.now();
 
     Serial.println(now.toString(buf, len));
@@ -139,8 +133,12 @@ String ReadTimeDate(byte data_ora) {
     if ( S < 10 ) ORA.concat ( "0"  );
     ORA.concat(S); // SECONDI
     /*
-    if (M<3) {M+=12; Y-=1;}
-    float JDN= ((2 - Y/100) + Y/400) + D + (365.25 * (Y + 4716)) + (30.6001 * (M + 1)) - 1524.5;
+    char Y = now.year();
+    char M = now.month();
+    char D = now.day();
+    char H = now.hour();
+    char Mn= now.minute();
+    char S = now.second();
 
     float d = JDN - 2451545.0;
     float T = d /36525;
@@ -160,3 +158,14 @@ String ReadTimeDate(byte data_ora) {
   */
 
 }
+
+String JulianDay () {
+     DateTime now = RTC.now();        
+  yr = now.year();
+  mo = now.month();
+  dd = now.day();
+    if (mo<3) {mo+=12; yr-=1;}
+    float JDN= ((2 - yr/100) + yr/400) + dd + (365.25 * (yr + 4716)) + (30.6001 * (mo + 1)) - 1524.5;
+return (String(JDN));
+}
+
