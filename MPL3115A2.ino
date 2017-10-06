@@ -1,3 +1,12 @@
+
+void init_MPL3115A2 () {
+  sensor.begin();
+  sensor.setModeAltimeter(); // Measure quota above sea level in meters
+  sensor.setModeBarometer(); // Measure pressione in Pascals from 20 to 110 kPa
+  sensor.setOversampleRate(7); // Set Oversample to the recommended 128
+  sensor.enableEventFlags(); // Enable all three pressione and temp event flags
+}
+
 void SENSOR(void) {
 
   BaroSensorRead(&pressione, &tempC, &quota);
@@ -23,8 +32,8 @@ void DisplayPresTemp(float* pressione, float* tempC, float* quota)
     u8g.drawStr(4, 40, "Altitudine");
     u8g.setPrintPos(75, 40);
     u8g.print(*quota);
-   _buf = "Premi ESC per uscire";
-   MESSAGGIO_MENU (_buf);
+    _buf = "Premi ESC per uscire";
+    MESSAGGIO_MENU (_buf);
   }
   while (u8g.nextPage());
 }

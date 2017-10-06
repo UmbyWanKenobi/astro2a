@@ -27,7 +27,7 @@ void Split_into_dms( float angle, unsigned int* _deg, unsigned int* _min ) {
   //  Serial.println(_deg);
   Serial.println(angle);
 
-
+   
 }
 
 float GRADI_DA_RADIANTI(float angolo) {
@@ -55,5 +55,19 @@ void MESSAGGIO_MENU (char* _buf) {
 
   u8g.drawStr(d, e - 1, _buf);
 
+}
+void init_12864() {
+  if (u8g.getMode() == U8G_MODE_R3G3B2)        {
+    u8g.setColorIndex(255);
+  }
+  else if (u8g.getMode() == U8G_MODE_GRAY2BIT) {
+    u8g.setColorIndex(3);
+  }
+  else if (u8g.getMode() == U8G_MODE_BW)       {
+    u8g.setColorIndex(1);
+  }
+  else if (u8g.getMode() == U8G_MODE_HICOLOR)  {
+    u8g.setHiColorByRGB(255, 255, 255);
+  }
 }
 

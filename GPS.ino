@@ -1,3 +1,10 @@
+void init_GPS() {
+  gpsSerial.begin(9600);
+  gpsSerial.println( F("$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28") ); // RMC & GGA only
+  gpsSerial.println( F("$PMTK220,1000*1F") ); // 1Hz update rate
+  waitForFix();
+}
+
 void printFix()
 {
   byte data_ora; // Seleziona il dato richiesto 0 per la data, 1 per l'ora

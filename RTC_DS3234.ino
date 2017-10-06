@@ -18,9 +18,9 @@ int init_RTC() {
 String ReadTimeDate(byte data_ora) {
   const int len = 32;
   static char buf[len];
-
+  String DATA, ORA, JD;
   DateTime now = RTC.now();
-
+/*
   Serial.println(now.toString(buf, len));
 
   Serial.print(" since midnight 1/1/1970 = ");
@@ -53,8 +53,7 @@ String ReadTimeDate(byte data_ora) {
 
 
   Serial.println();
-
-  String DATA, ORA, JD;
+*/
   if ( now.day() < 10 ) DATA.concat ( "0"  );
   DATA.concat(now.day()); // GIORNO
   DATA.concat("/") ;

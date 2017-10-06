@@ -25,18 +25,20 @@
   1 DS3234 orologio elettronico con quarzo stabilizzato in termperatura
   1 Controller RepRap con monitor 12864 (seriale), buzzer, encoder, letttore SD e pulsante integrati
 */
+#define build 2
+#define revision 1
 
 #include "U8glib.h"
 #include "Button.h"
 #include "RotaryEncoder.h"
-#include "pitches.h"
+#include "note.h"
 #include "Wire.h"
 #include "SparkFunMPL3115A2.h"
 #include "NMEAGPS.h"
 #include "DMS.h"
 #include "AccelStepper.h"
 #include "SPI.h"
-#include "math.h"       
+#include "math.h"
 #include "Kalman.h"
 #include "RTClib.h"
 
@@ -62,25 +64,15 @@ Button ESCAPE( 27,  BUTTON_PULLUP_INTERNAL);
 #define BOLLA     9
 #define DESTRA    8
 
-#define EN-       7      // TBH 7128
-#define EN+       6      // TBH 7128
-#define PUL-      5      // TBH 7128
-#define PUL+      4      // TBH 7128
-#define DIR-      3      // TBH 7128
-#define DIR+      2      // TBH 7128
+#define EN-       7      // THB7128
+#define EN+       6      // THB7128
+#define PUL-      5      // THB7128
+#define PUL+      4      // THB7128
+#define DIR-      3      // THB7128
+#define DIR+      2      // THB7128
 
 
- 
-#define SD_DET     26   // EXP2 7
-// PIN 27 ESCAPE        // EXP2 8
-// PIN 28 ENCODER       // EXP2 5
-#define SD_MOSI    29   // EXP2 6
-// PIN 30 ENCODER       // EXP2 3
-// PIN 31 NON USATO     // EXP2 4
-#define SD_MISO    32   // EXP2 1
-#define SD_SCK     33   // EXP2 2
-
-// PIN 47 P. SELETTORE  // EXP1 2 
+// PIN 47 P. SELETTORE  // EXP1 2
 #define BUZZER_PIN 46   // EXP1 1 
 #define CS_RS      45   // EXP1 4
 #define RW_SID     44   // EXP1 3
@@ -90,6 +82,16 @@ Button ESCAPE( 27,  BUTTON_PULLUP_INTERNAL);
 // PIN 40 NON USATO     // EXP1 7
 // Vin +5 SCUDO LCD     // EXP1 10
 //  GND   SCUDO LCD     // EXP1 9
+
+#define SD_DET     26   // EXP2 7
+// PIN 27 ESCAPE        // EXP2 8
+// PIN 28 ENCODER       // EXP2 5
+#define SD_MOSI    29   // EXP2 6
+// PIN 30 ENCODER       // EXP2 3
+// PIN 31 NON USATO     // EXP2 4
+#define SD_MISO    32   // EXP2 1
+#define SD_SCK     33   // EXP2 2
+
 
 //const int  cs=53;
 #define MPU 0x68  // I2C address of the MPU-6050
@@ -110,13 +112,13 @@ const int noteDurations[] = {  // note durations: 4 = quarter note, 8 = eighth n
 char *menu_strings[6] =
 { "Impostazioni", "Calibrazione", "Start", "Reset", "0", "3"};
 String _buffer = "  ";
-char *_buf =" ";
+char *_buf = " ";
 uint32_t timer;
 uint8_t menu_current = 0;
 static int REFRESH  ;
 static int newPos = 0 ;
 static int pos = 0 ;
-double  AcX,AcY,AcZ,Tmp,GyX,GyY,GyZ;
+double  AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
 
 
 float Inclinazione, Altezza;
@@ -132,38 +134,19 @@ float quota = 0.0;
 
 void setup()
 {
-  if (u8g.getMode() == U8G_MODE_R3G3B2)        {
-    u8g.setColorIndex(255);
-  }
-  else if (u8g.getMode() == U8G_MODE_GRAY2BIT) {
-    u8g.setColorIndex(3);
-  }
-  else if (u8g.getMode() == U8G_MODE_BW)       {
-    u8g.setColorIndex(1);
-  }
-  else if (u8g.getMode() == U8G_MODE_HICOLOR)  {
-    u8g.setHiColorByRGB(255, 255, 255);
-  }
+
+  Serial.begin(115200);
+  
   pinMode (SINISTRA, OUTPUT);
   pinMode (BOLLA, OUTPUT);
   pinMode (DESTRA, OUTPUT);
 
-  Serial.begin(115200);
-  sensor.begin();
-  sensor.setModeAltimeter(); // Measure quota above sea level in meters
-  sensor.setModeBarometer(); // Measure pressione in Pascals from 20 to 110 kPa
-  sensor.setOversampleRate(7); // Set Oversample to the recommended 128
-  sensor.enableEventFlags(); // Enable all three pressione and temp event flags
-
-
-  gpsSerial.begin(9600);
-  gpsSerial.println( F("$PMTK314,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28") ); // RMC & GGA only
-  gpsSerial.println( F("$PMTK220,1000*1F") ); // 1Hz update rate
-  waitForFix();
-  init_RTC(); // Inizializzazione DS3234
-  init_MPU(); // Inizializzazione MPU6050
-
-  Init_Splash_Draw ();
+  init_12864();        // Inizializzazione monitor 12864
+  init_MPL3115A2();    // Inizializzazione  Barometro/Altimetro MPL3115A2
+  init_GPS();          // Inizializzazione GPS GY-GPS6MV1
+  init_RTC();          // Inizializzazione Realt Time Clock DS3234
+  init_MPU();          // Inizializzazione Accelerometro/Giroscopio MPU6050
+  Init_Splash_Draw (); // Schermata d'avvio
 } // setup()
 
 void UpdateMenu () {
@@ -254,9 +237,9 @@ void loop()
 
   u8g.firstPage();
   do {
-   //
-   UpdateMenu ();
-//ReadTimeDate();
+    //
+    UpdateMenu ();
+    //ReadTimeDate();
   } while ( u8g.nextPage() );
 
 } // loop ()
