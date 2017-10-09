@@ -1,11 +1,4 @@
 
-void init_MPL3115A2 () {
-  sensor.begin();
-  sensor.setModeAltimeter(); // Measure quota above sea level in meters
-  sensor.setModeBarometer(); // Measure pressione in Pascals from 20 to 110 kPa
-  sensor.setOversampleRate(7); // Set Oversample to the recommended 128
-  sensor.enableEventFlags(); // Enable all three pressione and temp event flags
-}
 
 void SENSOR(void) {
 

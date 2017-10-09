@@ -1,4 +1,4 @@
-#include "Pitches.h"
+#include "note.h"
 #define header_width 40
 #define header_height 40
 const unsigned char header_bits[] U8G_PROGMEM = {
@@ -32,8 +32,7 @@ void Init_Splash_Draw () {
     u8g.drawStr( 16, 63, "ilpoliedrico.com");
   } while ( u8g.nextPage() );
   Musichina ();
-    Serial.println (JulianDay());  
-  delay(3000);
+     delay(3000);
 }
 void Musichina () {
   for (int thisNote = 0; thisNote < 5; thisNote++) {

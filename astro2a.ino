@@ -28,6 +28,12 @@
 #define build 2
 #define revision 1
 #define DEBUG   // Non commentare per test
+#ifdef DEBUG                    // Per Uso  
+#define sp Serial.print
+#define spln Serial.println     //   di
+#endif                          //  debug
+
+
 
 #include "U8glib.h"
 #include "Button.h"
@@ -64,6 +70,7 @@ Button ESCAPE( 27,  BUTTON_PULLUP_INTERNAL);
 #define SINISTRA 10
 #define BOLLA     9
 #define DESTRA    8
+#define LED_GPS   14
 
 #define EN-       7      // THB7128
 #define EN+       6      // THB7128
@@ -99,8 +106,8 @@ U8GLIB_ST7920_128X64_1X u8g( E_SCLK, RW_SID, CS_RS );
 MPL3115A2 sensor;
 NMEAGPS  GPS;
 gps_fix  fix;
-int yr, mo, dd, hh, mn, ss;
- 
+int yr, mo, dy, hr, mn, se, dw, uxt, osec=-1;
+
 
 const int melody[] = {
   NOTE_D7, NOTE_E7, NOTE_C7, NOTE_C6, NOTE_G6 //Musichina
@@ -114,6 +121,7 @@ char *menu_strings[6] =
 { "Impostazioni", "Calibrazione", "Start", "Reset", "0", "3"};
 String _buffer = "  ";
 char *_buf = " ";
+ String DATA; // Flag del dato richiesto: 0 per la data, 1 per UTC,2 per l'ora locale, 3 per JDN, 4 ora siderale
 uint32_t timer;
 uint8_t menu_current = 0;
 static int REFRESH  ;
@@ -123,10 +131,22 @@ double  AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ;
 
 
 float Inclinazione, Altezza;
-const float pi PROGMEM = 3.1415926535898;   // Angolo di inizio
-const float GIORNO_SOLARE PROGMEM = 86400; // Giorno solare in secondi
-const float GIORNO_SIDERALE PROGMEM = 86164.0419; // Giorno siderale in secondi e decimali
-const float SEC_SIDERALE = 1 / ( GIORNO_SIDERALE / GIORNO_SOLARE );  // Converte un secondo in tempo siderale
+#define pi 3.1415926535898   // PI GRECO
+// sidereal calculation constants
+#define dc 0.06570982441908
+#define un_sid 1.00273790935          // Rapporto tra giorno solare medio e giorno siderale all'equinozio d'inverno
+#define gc 6.697374558
+#define g2000 6.5988098
+#define lc 0.0497958000000001
+#define nc -0.0159140999999998
+#define JDunix 2440587.5              // Data giuliana a mezzanotte del 1/1/1970
+#define siderealday 23.9344699        // Lunghezza del giorno siderale (23:56:04)
+double GST,LST,utc;                   // Tempo siderale di Greenwich e locale
+int dh,dm,ds;                         // Espressione del tempo locale siderale ((HH:MM:SS)
+
+
+int TZ = 1; 
+int DST = 0;
 
 float pressione = 0.0;
 float tempC = 0.0;
@@ -142,13 +162,14 @@ void setup()
   pinMode (SINISTRA, OUTPUT);
   pinMode (BOLLA, OUTPUT);
   pinMode (DESTRA, OUTPUT);
-
+  pinMode( LED_GPS, OUTPUT );
+  
+  Init_Splash_Draw (); // Schermata d'avvio
   init_12864();        // Inizializzazione monitor 12864
   init_MPL3115A2();    // Inizializzazione  Barometro/Altimetro MPL3115A2
-  init_GPS();          // Inizializzazione GPS GY-GPS6MV1
   init_RTC();          // Inizializzazione Realt Time Clock DS3234
   init_MPU();          // Inizializzazione Accelerometro/Giroscopio MPU6050
-  Init_Splash_Draw (); // Schermata d'avvio
+  init_GPS();          // Inizializzazione GPS GY-GPS6MV1
 } // setup()
 
 void UpdateMenu () {
@@ -240,8 +261,8 @@ void loop()
   u8g.firstPage();
   do {
     //
-    UpdateMenu ();
-    //ReadTimeDate();
+   UpdateMenu ();
+ 
   } while ( u8g.nextPage() );
 
 } // loop ()

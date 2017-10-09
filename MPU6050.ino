@@ -79,15 +79,6 @@ void LIVELLA()
   // delay (500);
 }
 
-void init_MPU() {
-  Wire.begin();
-  Wire.beginTransmission(MPU);
-  Wire.write(0x6B);  // PWR_MGMT_1 register
-  Wire.write(0);     // set to zero (wakes up the MPU-6050)
-  Wire.endTransmission(true);
-  //delay(1000);
-}
-
 //Funzione per il calcolo degli angoli Inclinazione e Altezza
 double INCLINAZIONE_ALTEZZA(double A, double B, double C, double D) {
  double dt = (double)(micros() - timer) / 1000000; // Calcola il tempo di deriva
