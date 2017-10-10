@@ -2,11 +2,11 @@
 
 void PRINT_INFO()
 {
-  byte data_ora, // Seleziona il dato richiesto 0 per la data, 1 per l'ora, 2 per JDN
+  byte data_ora, // // Flag del dato richiesto: 0 per la data, 1 per UTC, 2 per l'ora locale, 3 per JDN, 4 per l'ora siderale locale
        lat_long; // Seleziona il dato richiesto 0 per la latitudine, 1 per la longitudine
 
   u8g.setPrintPos(1, 0);
-  data_ora = 1;
+  data_ora = 3;
   u8g.print(ReadTimeDate(data_ora));
  /* 
   u8g.setPrintPos(1, 8);
@@ -23,7 +23,8 @@ data_ora = 4;
 }
 String ReadLatLong (byte lat_long) {
   String INFO;
-  waitForFix();
+   if (GPS.available( gpsSerial )) {
+      fix = GPS.read();}
   if (lat_long == 0) {
     INFO.concat("Lat:");
     printDD_MMmmmm( fix.latitudeDMS, fix.latitudeDMS.NS() );
@@ -32,83 +33,61 @@ String ReadLatLong (byte lat_long) {
     printDD_MMmmmm( fix.longitudeDMS, fix.longitudeDMS.NS() );
   }
 
-  INFO.concat(_buffer);
+  INFO.concat(DATA);
   return (INFO);
 
 
 }
 
 void printTime () {
-  _buffer = "";
-  // waitForFix();
-  if (fix.valid.time) {
+  DATA = "";
+    if (fix.valid.time) {
     if (fix.dateTime.hours < 10)
-      _buffer += "0";
-    _buffer += fix.dateTime.hours;
-    _buffer += ':';
+      DATA += "0";
+    DATA += fix.dateTime.hours;
+    DATA += ':';
     if (fix.dateTime.minutes < 10)
-      _buffer += "0" ;
-    _buffer += (fix.dateTime.minutes);
-    _buffer += ':';
+      DATA += "0" ;
+    DATA += (fix.dateTime.minutes);
+    DATA += ':';
     if (fix.dateTime.seconds < 10)
-      _buffer += "0";
-    _buffer += fix.dateTime.seconds;
+      DATA += "0";
+    DATA += fix.dateTime.seconds;
   }
-  return _buffer;
+  return DATA;
 
 }
 
 void printDate () {
-  _buffer = "";
+  DATA = "";
   
   if (fix.valid.date) {
     if (fix.dateTime.date < 10)
-      _buffer += "0";
-    _buffer += fix.dateTime.date;
-    _buffer += '/';
+      DATA += "0";
+    DATA += fix.dateTime.date;
+    DATA += '/';
     if (fix.dateTime.month < 10)
-      _buffer += "0";
-    _buffer += fix.dateTime.month;
-    _buffer += '/';
-    _buffer += fix.dateTime.full_year() ;
+      DATA += "0";
+    DATA += fix.dateTime.month;
+    DATA += '/';
+    DATA += fix.dateTime.full_year() ;
   }
-  return _buffer;
+  return DATA;
   Serial.println();
 
 }
 void printDD_MMmmmm( DMS_t & dms, char hemisphere )
 {
   
-  _buffer  = "";
-  _buffer += dms.degrees;
-  _buffer += "\xb0";
+  DATA  = "";
+  DATA += dms.degrees;
+  DATA += "\xb0";
   if (dms.minutes < 10)
-    _buffer += "0";
+    DATA += "0";
   float minutes = dms.minutes;
   minutes += (dms.seconds_whole * 1000.0 + dms.seconds_frac) / (60.0 * 1000.0);
-  _buffer += minutes;
-  _buffer += hemisphere;
-  return _buffer;
+  DATA += minutes;
+  DATA += hemisphere;
+  return DATA;
 }
-void waitForFix() {
- uint8_t fixes = 0;
-  uint16_t lastToggle = millis();
-    digitalWrite( LED_GPS, LOW );
-  do {
-    if (GPS.available( gpsSerial )) {
-      fix = GPS.read();
-      fixes++;
-       // Slowly flash the LED until we get a fix
-    if ((uint16_t) millis() - lastToggle > 500) {
-      lastToggle += 500;
-      digitalWrite( LED_GPS, !digitalRead(LED_GPS) );
-    }
-    }
-  } while ((fixes < 2) && !fix.valid.location);
-  digitalWrite( LED_GPS, LOW );
 
-  GPS.overrun( false );                                           // we had to wait a while...
-
-
-
-} // waitForFix

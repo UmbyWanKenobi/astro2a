@@ -91,16 +91,17 @@ void LMT() {
 }
 
 
-String OraSiderale() {    // Basato su "ASTR 310 - Observational Astronomy: Formula for Greenwich Sidereal Time (GST)"
-  //  http://www.astro.umd.edu/~jph/GST_eqn.pdf
-  waitForFix();           // calcolo dinamico sulla posizione assoluta GPS
+String OraSiderale() {     // Basato su algoritmo di "The United States Naval Observatory (USNO)"
+                           // http://aa.usno.navy.mil/faq/docs/GAST.php
+  if (GPS.available( gpsSerial )) {
+      fix = GPS.read();}        // calcolo dinamico sulla posizione assoluta GPS
   DateTime now = RTC.now();                          // current time
 
   // int ny = GiorniAnno(now.year(), now.month(), now.day());
 
   // calculate GST and Local Sidereal Time (LST)
-  GST = gc + (dc * ((now.unixtime() / 86400L) + .5 )) + (un_sid * 24 * UTC() ); // Tempo siderale di Greenwich in formato decimale
-  LST = GST + 24.0 + (float)(fix.longitude() / 360 * siderealday); // Tempo siderale locale stabilito dal GPS in formato decimale
+  GST = Cost_G + (dc * ((now.unixtime() / 86400L) + .5 )) + (un_sid * 24 * UTC() ); // Tempo siderale di Greenwich in formato decimale
+  LST = GST + 24.0 + (float)(fix.longitude() / 360 * giorno_siderale); // Tempo siderale locale stabilito dal GPS in formato decimale
   while (LST >= 24.0 ) {
     LST -= 24.0;  // accordo le 24 ore
   }
@@ -120,44 +121,4 @@ String OraSiderale() {    // Basato su "ASTR 310 - Observational Astronomy: Form
   return (DATA);
 }
 
-
-
-int GiorniAnno(int y, int m, int d) {
-  int GiorniDelMese[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
-  if (y % 4  == 0) {                //
-    if (y % 100 != 0) {             //
-      GiorniDelMese[1] = 29;        //Calcolo
-    }                               //
-    else {                          // del
-      if (y % 400 == 0) {           //
-        GiorniDelMese[1] = 29;      // bisestile
-      }                             //
-    }                               //
-  }                                //
-
-  int dy = 0;
-  for (int i = 0; i < m - 1; i++) {
-    dy += GiorniDelMese[i];
-  }
-
-  dy += d;
-  return dy;                      // Giorni dall'inizio dell'annno
-}
-
-
-
-boolean IsDST() {
-  if (mo < 3 || mo > 11) {
-    return false;                 // Gennaio, Febbraio e Dicembre non hanno ora legale
-  }
-  if (mo > 3 && mo < 11) {
-    return true;                  // da Aprile a Ottobre vige l'ora legale
-  }
-  int previousSunday = dy - dw;
-  if (mo == 3) {
-    return previousSunday >= 8;  // Trova l'ultima domenica di Marzo
-  }
-  return previousSunday <= 0;    // e l'ultima domenica di Ottobre per il salto
-}
 

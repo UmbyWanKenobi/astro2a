@@ -70,7 +70,8 @@ Button ESCAPE( 27,  BUTTON_PULLUP_INTERNAL);
 #define SINISTRA 10
 #define BOLLA     9
 #define DESTRA    8
-#define LED_GPS   14
+#define LED_GPS0   14
+#define LED_GPS1   15
 
 #define EN-       7      // THB7128
 #define EN+       6      // THB7128
@@ -103,7 +104,7 @@ Button ESCAPE( 27,  BUTTON_PULLUP_INTERNAL);
 
 #define MPU 0x68  // I2C address of the MPU-6050
 U8GLIB_ST7920_128X64_1X u8g( E_SCLK, RW_SID, CS_RS );
-MPL3115A2 sensor;
+MPL3115A2 MPL;
 NMEAGPS  GPS;
 gps_fix  fix;
 int yr, mo, dy, hr, mn, se, dw, uxt, osec=-1;
@@ -119,9 +120,9 @@ const int noteDurations[] = {  // note durations: 4 = quarter note, 8 = eighth n
 #define MENU_ITEMS 4
 char *menu_strings[6] =
 { "Impostazioni", "Calibrazione", "Start", "Reset", "0", "3"};
-String _buffer = "  ";
+
 char *_buf = " ";
- String DATA; // Flag del dato richiesto: 0 per la data, 1 per UTC,2 per l'ora locale, 3 per JDN, 4 ora siderale
+ String DATA; 
 uint32_t timer;
 uint8_t menu_current = 0;
 static int REFRESH  ;
@@ -135,12 +136,12 @@ float Inclinazione, Altezza;
 // sidereal calculation constants
 #define dc 0.06570982441908
 #define un_sid 1.00273790935          // Rapporto tra giorno solare medio e giorno siderale all'equinozio d'inverno
-#define gc 6.697374558
-#define g2000 6.5988098
+#define Cost_G 6.697374558
+
 #define lc 0.0497958000000001
 #define nc -0.0159140999999998
 #define JDunix 2440587.5              // Data giuliana a mezzanotte del 1/1/1970
-#define siderealday 23.9344699        // Lunghezza del giorno siderale (23:56:04)
+#define giorno_siderale 23.9344699        // Lunghezza del giorno siderale (23:56:04)
 double GST,LST,utc;                   // Tempo siderale di Greenwich e locale
 int dh,dm,ds;                         // Espressione del tempo locale siderale ((HH:MM:SS)
 
@@ -162,7 +163,8 @@ void setup()
   pinMode (SINISTRA, OUTPUT);
   pinMode (BOLLA, OUTPUT);
   pinMode (DESTRA, OUTPUT);
-  pinMode( LED_GPS, OUTPUT );
+  pinMode( LED_GPS0, OUTPUT );  // In attesa del fix dai satelliti
+  pinMode( LED_GPS1, OUTPUT );  // Sistema aggangiato
   
   Init_Splash_Draw (); // Schermata d'avvio
   init_12864();        // Inizializzazione monitor 12864
@@ -208,7 +210,7 @@ void UpdateMenu () {
         break;
       case 1:
         while (ESCAPE.isPressed () == false) {
-          SENSOR();
+          BAROMETRO();
         }
         break;
       case 2:
@@ -261,7 +263,7 @@ void loop()
   u8g.firstPage();
   do {
     //
-   UpdateMenu ();
+    waitForFix() ;
  
   } while ( u8g.nextPage() );
 

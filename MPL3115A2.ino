@@ -1,8 +1,8 @@
 
 
-void SENSOR(void) {
+void BAROMETRO(void) {
 
-  BaroSensorRead(&pressione, &tempC, &quota);
+  BaroMPLRead(&pressione, &tempC, &quota);
   DisplayPresTemp(&pressione, &tempC, &quota);
 }
 void DisplayPresTemp(float* pressione, float* tempC, float* quota)
@@ -30,15 +30,15 @@ void DisplayPresTemp(float* pressione, float* tempC, float* quota)
   }
   while (u8g.nextPage());
 }
-void BaroSensorRead(float* pressione, float* tempC, float* quota)
+void BaroMPLRead(float* pressione, float* tempC, float* quota)
 {
-  *tempC = sensor.readTemp();
+  *tempC = MPL.readTemp();
 
-  *pressione = sensor.readPressure() / 100.0;
+  *pressione = MPL.readPressure() / 100.0;
 
 
   // Calculate quota assuming 'standard' barometric
   // pressione of 1013.25 millibar = 101325 Pascal
-  *quota =  sensor.readAltitude() / 131.2335958852;
+  *quota =  MPL.readAltitude() / 131.2335958852;
 
 }
