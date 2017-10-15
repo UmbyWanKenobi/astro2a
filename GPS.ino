@@ -40,6 +40,7 @@ String ReadLatLong (byte lat_long) {
 }
 
 void printTime () {
+  /*
   DATA = "";
     if (fix.valid.time) {
     if (fix.dateTime.hours < 10)
@@ -55,10 +56,11 @@ void printTime () {
     DATA += fix.dateTime.seconds;
   }
   return DATA;
-
+*/
 }
 
 void printDate () {
+  /*
   DATA = "";
   
   if (fix.valid.date) {
@@ -74,7 +76,7 @@ void printDate () {
   }
   return DATA;
   Serial.println();
-
+*/
 }
 void printDD_MMmmmm( DMS_t & dms, char hemisphere )
 {

@@ -26,7 +26,7 @@
   1 Controller RepRap con monitor 12864 (seriale), buzzer, encoder, letttore SD e pulsante integrati
 */
 #define build 2
-#define revision 1
+#define revision 5
 #define DEBUG   // Non commentare per test
 #ifdef DEBUG                    // Per Uso  
 #define sp Serial.print
@@ -52,14 +52,6 @@
 // Create an RTC instance, using the chip select pin it's connected to
 RTC_DS3234 RTC(53);
 
-byte a_day;
-byte a_Hour;
-byte a_Minute;
-byte a_Second;
-byte a_bits;
-bool a_Dy;
-bool a_h12;
-bool a_PM;
 Kalman KalmanValue;
 
 RotaryEncoder encoder(30, 28);
@@ -73,12 +65,9 @@ Button ESCAPE( 27,  BUTTON_PULLUP_INTERNAL);
 #define LED_GPS0   14
 #define LED_GPS1   15
 
-#define EN-       7      // THB7128
-#define EN+       6      // THB7128
-#define PUL-      5      // THB7128
-#define PUL+      4      // THB7128
-#define DIR-      3      // THB7128
-#define DIR+      2      // THB7128
+#define ENp       5      // THB7128
+#define PULp      6      // THB7128
+#define DIRp      7      // THB7128
 
 
 // PIN 47 P. SELETTORE  // EXP1 2
@@ -107,7 +96,7 @@ U8GLIB_ST7920_128X64_1X u8g( E_SCLK, RW_SID, CS_RS );
 MPL3115A2 MPL;
 NMEAGPS  GPS;
 gps_fix  fix;
-int yr, mo, dy, hr, mn, se, dw, uxt, osec=-1;
+int yr, mo, dy, hr, mn, se, dw, uxt, osec = -1;
 
 
 const int melody[] = {
@@ -122,7 +111,7 @@ char *menu_strings[6] =
 { "Impostazioni", "Calibrazione", "Start", "Reset", "0", "3"};
 
 char *_buf = " ";
- String DATA; 
+String DATA;
 uint32_t timer;
 uint8_t menu_current = 0;
 static int REFRESH  ;
@@ -142,11 +131,11 @@ float Inclinazione, Altezza;
 #define nc -0.0159140999999998
 #define JDunix 2440587.5              // Data giuliana a mezzanotte del 1/1/1970
 #define giorno_siderale 23.9344699        // Lunghezza del giorno siderale (23:56:04)
-double GST,LST,utc;                   // Tempo siderale di Greenwich e locale
-int dh,dm,ds;                         // Espressione del tempo locale siderale ((HH:MM:SS)
+double GST, LST, utc;                 // Tempo siderale di Greenwich e locale
+int dh, dm, ds;                       // Espressione del tempo locale siderale ((HH:MM:SS)
 
 
-int TZ = 1; 
+int TZ = 1;
 int DST = 0;
 
 float pressione = 0.0;
@@ -160,12 +149,16 @@ void setup()
   Serial.begin(115200);         //   di
 #endif                          //  debug
 
+  pinMode (ENp, OUTPUT);
+  pinMode (PULp, OUTPUT);
+  pinMode (DIRp, OUTPUT);
+
   pinMode (SINISTRA, OUTPUT);
   pinMode (BOLLA, OUTPUT);
   pinMode (DESTRA, OUTPUT);
   pinMode( LED_GPS0, OUTPUT );  // In attesa del fix dai satelliti
   pinMode( LED_GPS1, OUTPUT );  // Sistema aggangiato
-  
+
   Init_Splash_Draw (); // Schermata d'avvio
   init_12864();        // Inizializzazione monitor 12864
   init_MPL3115A2();    // Inizializzazione  Barometro/Altimetro MPL3115A2
@@ -264,7 +257,7 @@ void loop()
   do {
     //
     waitForFix() ;
- 
+
   } while ( u8g.nextPage() );
 
 } // loop ()

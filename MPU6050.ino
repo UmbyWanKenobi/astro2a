@@ -86,12 +86,12 @@ double INCLINAZIONE_ALTEZZA(double A, double B, double C, double D) {
 
 
   double val_D = D / 131.0; // Converte in gr/s;
-  double val_B = sqrt((B * B) + (C * C));
-  //val_B = sqrt(val_B);
+ //double val_B = sqrt((B * B) + (C * C));
+  double val_B = sqrt(val_B);
 
   double Value = atan2(A, val_B) * 180 / pi;
   //Value = Value * 180 / pi;
-Value = KalmanValue.getAngle(Value, val_D, dt);
+//Value = KalmanValue.getAngle(Value, val_D, dt);
   return (float)Value;
 }
 

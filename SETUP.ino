@@ -15,7 +15,7 @@ void init_MPL3115A2 () {
 
 
 void init_MPU() {
-  Wire.begin();
+ Wire.begin();
   Wire.beginTransmission(MPU);
   Wire.write(0x6B);  // PWR_MGMT_1 register
   Wire.write(0);     // set to zero (wakes up the MPU-6050)

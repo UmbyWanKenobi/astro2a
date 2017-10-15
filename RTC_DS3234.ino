@@ -49,7 +49,8 @@ String ReadTimeDate(byte data_ora) {
       DATA.concat(JD0());
       DATA.concat(".");
       DATA.concat( JD1() );
-      return (DATA);
+     spln (JD1());
+     return (DATA);
       break;
     case 4:
       return (OraSiderale());
@@ -67,9 +68,11 @@ float UTC() {
   return ((float)( now.hour() / 24.0f ) + (float)( now.minute() / 1440.0f ) + (float)( now.second() / 86400.0f ) );
 
 }
-unsigned long JD1() {
-  sp ("UTC: "); sp(UTC());
-  return (unsigned long)( ( UTC() + .5 ) * 100000.0f ) % 100000;
+String JD1() {
+ char ccc [9];
+unsigned long JD1 = (unsigned long)( (  UTC() + .5 ) * 100000.0f ) % 100000;
+sprintf (ccc,"%05u",JD1);
+return (String(ccc));
 }
 
 void LMT() {
