@@ -109,7 +109,7 @@ const int noteDurations[] = {  // note durations: 4 = quarter note, 8 = eighth n
 #define MENU_ITEMS 4
 char *menu_strings[6] =
 { "Impostazioni", "Calibrazione", "Start", "Reset", "0", "3"};
-
+  char ccc [19];
 char *_buf = " ";
 String DATA;
 uint32_t timer;

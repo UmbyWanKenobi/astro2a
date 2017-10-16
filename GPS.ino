@@ -6,7 +6,7 @@ void PRINT_INFO()
        lat_long; // Seleziona il dato richiesto 0 per la latitudine, 1 per la longitudine
 
   u8g.setPrintPos(1, 0);
-  data_ora = 3;
+  data_ora = 4;
   u8g.print(ReadTimeDate(data_ora));
  /* 
   u8g.setPrintPos(1, 8);
@@ -39,45 +39,7 @@ String ReadLatLong (byte lat_long) {
 
 }
 
-void printTime () {
-  /*
-  DATA = "";
-    if (fix.valid.time) {
-    if (fix.dateTime.hours < 10)
-      DATA += "0";
-    DATA += fix.dateTime.hours;
-    DATA += ':';
-    if (fix.dateTime.minutes < 10)
-      DATA += "0" ;
-    DATA += (fix.dateTime.minutes);
-    DATA += ':';
-    if (fix.dateTime.seconds < 10)
-      DATA += "0";
-    DATA += fix.dateTime.seconds;
-  }
-  return DATA;
-*/
-}
 
-void printDate () {
-  /*
-  DATA = "";
-  
-  if (fix.valid.date) {
-    if (fix.dateTime.date < 10)
-      DATA += "0";
-    DATA += fix.dateTime.date;
-    DATA += '/';
-    if (fix.dateTime.month < 10)
-      DATA += "0";
-    DATA += fix.dateTime.month;
-    DATA += '/';
-    DATA += fix.dateTime.full_year() ;
-  }
-  return DATA;
-  Serial.println();
-*/
-}
 void printDD_MMmmmm( DMS_t & dms, char hemisphere )
 {
   
